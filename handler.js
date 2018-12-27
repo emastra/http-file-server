@@ -1,52 +1,16 @@
 const fs = require('fs');
-const app_dir = require('./config').app_dir;
 const path = require('path');
 
-var { sendResponse, collectData } = require('./utilities');
+const app_dir = require('./config').app_dir;
+let {respond, convertBytes, mimeTypes} = require('./utils/utilities');
 
-var respond = (res, status, data, type) => {
-  res.writeHead(status, {
-    "Content-Type": type || "text/plain"
-  });
-  res.end(data);
-};
-
-var bytesTrans = 0;
-function niceBytes(x) {
-  // the result differs from what linux file property shows. Check this function math
-  const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  let l = 0, n = parseInt(x, 10) || 0;
-  while(n >= 1024 && ++l)
-      n = n/1024;
-  return(n.toFixed(n >= 10 || l < 1 ? 0 : 1) + ' ' + units[l]);
-}
-
-const mimeTypes = {
-  // Extension to MIME Type
-  '.ico': 'image/x-icon',
-  '.html': 'text/html',
-  '.js': 'text/javascript',
-  '.json': 'application/json',
-  '.css': 'text/css',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.wav': 'audio/wav',
-  '.mp3': 'audio/mpeg',
-  '.svg': 'image/svg+xml',
-  '.pdf': 'application/pdf',
-  '.doc': 'application/msword',
-  '.eot': 'appliaction/vnd.ms-fontobject',
-  '.ttf': 'aplication/font-sfnt',
-  '.mp4': 'video/mp4'
-};
-
-
-
-var actions = {
+// GET, POST and DELETE actions
+let actions = {
   'GET': (filepath, request, response) => {
-    var fullpathfile = app_dir + filepath;
+    let fullFilepath = app_dir + filepath;
+    let transferredBytes = 0;
 
-    fs.stat(fullpathfile, function(error, stats) {
+    fs.stat(fullFilepath, function(error, stats) {
       // file doesnt exist
       if (error && error.code == "ENOENT") {
         respond(response, 404, '404 File not found.');
@@ -60,22 +24,22 @@ var actions = {
       }
       else {
         // extract extension and set mimeType
-        var ext = path.extname(fullpathfile);
-        var mimeType = mimeTypes[ext] || 'text/plain';
+        let ext = path.extname(fullFilepath);
+        let mimeType = mimeTypes[ext] || 'text/plain';
         console.log('File to be transferred is:', mimeType);
 
         // create readStream fromfile path
-        var file = fs.createReadStream(decodeURIComponent(fullpathfile));
+        let file = fs.createReadStream(decodeURIComponent(fullFilepath));
         // set header
         response.writeHead(200, {"Content-Type": mimeType});
 
         // streaming with event handlers, data and end events
         file.on('data', function(chunk) {
-          bytesTrans += chunk.byteLength;
+          transferredBytes += chunk.byteLength;
           response.write(chunk);
         });
         file.on('end', function() {
-          console.log(niceBytes(bytesTrans), `(${bytesTrans} bytes)`, 'transferred correctly');
+          console.log(convertBytes(transferredBytes), `(${transferredBytes} bytes)`, 'transferred correctly');
           response.end();
         });
       }
@@ -83,12 +47,10 @@ var actions = {
   },
 
   'POST': (filepath, request, response) => {
-    // collectData(request, (formattedData) => {
-    //   // do something with the formatted data e.g. store in db
-    //   sendResponse(response, 'Success', 200, {'Content-Type': 'text/plain'});
-    // });
-    var fullpathfile = app_dir + filepath;
-    fs.stat(fullpathfile, function(err, stat) {
+    let fullFilepath = app_dir + filepath;
+    let transferredBytes = 0;
+
+    fs.stat(fullFilepath, function(err, stat) {
       if (err == null) {
         // file exists
         respond(response, 403, '403 File already exists. Use PUT to update the file.');
@@ -96,19 +58,18 @@ var actions = {
       else if (err.code == 'ENOENT') {
         // file doesnt exist
         // create writeStream and handlers
-        console.log('file doesnt exist!!!!!!!', 'outstream in', fullpathfile)
-        var outStream = fs.createWriteStream(fullpathfile);
+        let outStream = fs.createWriteStream(fullFilepath);
         outStream.on("error", function(error) {
           console.log('error writeStream on error');
         });
         // writable streams have finish event, readable streams have end event
         outStream.on("finish", function() {
-          console.log(niceBytes(bytesTrans), `(${bytesTrans} bytes)`, 'written correctly');
+          console.log(convertBytes(transferredBytes), `(${transferredBytes} bytes)`, 'written correctly');
         });
         // stream with event handlers
         request.on('data', function(chunk) {
           // on data from client, write it to outStream
-          bytesTrans += chunk.byteLength;
+          transferredBytes += chunk.byteLength;
           outStream.write(chunk);
         });
         request.on('end', function() {
@@ -125,9 +86,9 @@ var actions = {
   },
 
   'DELETE': (filepath, request, response) => {
-    var fullpathfile = app_dir + filepath;
+    let fullFilepath = app_dir + filepath;
 
-    fs.stat(fullpathfile, function(error, stats) {
+    fs.stat(fullFilepath, function(error, stats) {
       if (error && error.code == "ENOENT") {
         // if file doesnt exist
         respond(response, 404, '404 File not found.');
@@ -142,7 +103,7 @@ var actions = {
       }
       else {
         // delete file from hdd
-        fs.unlink(fullpathfile, function(error, file) {
+        fs.unlink(fullFilepath, function(error, file) {
           if (error) {
             respond(response, 500, error.toString());
           }
@@ -157,12 +118,13 @@ var actions = {
 
 };
 
+
 module.exports = (filepath, request, response) => {
-  var action = actions[request.method];
+  let action = actions[request.method];
   if (action) {
     action(filepath, request, response);
   } else {
   // add catch all error handler
-    sendResponse(response, "Not Found", 404);
+    respond(response, 404, 'Not Found');
   }
 };
