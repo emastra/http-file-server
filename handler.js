@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-
 const app_dir = require('./config').app_dir;
-let {respond, convertBytes, mimeTypes} = require('./utils/utilities');
+const {respond, convertBytes} = require('./utils/utilities');
+const mimeTypes = require('./utils/mimeTypes');
 
 // GET, POST and DELETE actions
 let actions = {

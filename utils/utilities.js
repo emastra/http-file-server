@@ -16,5 +16,5 @@ const convertBytes = (x) => {
 
 module.exports = {
   respond,
-  convertBytes,
+  convertBytes
 }

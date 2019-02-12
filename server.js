@@ -1,7 +1,6 @@
 const http = require('http');
 const url = require('url');
 const fs = require('fs');
-// const { sendResponse, collectData } = require('./utilities');
 const handler = require('./handler');
 const staticServer = require('./utils/staticServer');
 const fileExists = require('./utils/fileExists');

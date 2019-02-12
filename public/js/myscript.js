@@ -1,7 +1,6 @@
 // get request to fetch string of all files
 var req = new XMLHttpRequest();
 req.open("GET", "/api/allFiles", true);
-//req.setRequestHeader('needallfiles', true);
 req.addEventListener("load", function() {
   var filesArray = req.responseText.split('\n');
   var ul = document.querySelector('#list');
@@ -11,14 +10,14 @@ req.addEventListener("load", function() {
     a.setAttribute('href', 'http://localhost:8000/' + encodeURIComponent(item));
     a.textContent = item;
     let button = document.createElement('button');
-    button.setAttribute('id', 'delete-button');
+    button.setAttribute('class', 'delete-button');
     button.setAttribute('file', item);
     button.textContent = 'Delete';
     li.appendChild(a);
     li.appendChild(button);
     ul.appendChild(li);
   });
-  var deleteButton = document.querySelectorAll('#delete-button');
+  var deleteButton = document.querySelectorAll('.delete-button');
   deleteButton.forEach(function(button) {
     button.addEventListener("click", deleteFile);
   });

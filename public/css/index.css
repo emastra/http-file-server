@@ -1,7 +1,64 @@
+body {
+  color: #2d2727;
+  background-image: url('/img/bg-g.jpeg');
+}
+
+header {
+  background-color: #266626;
+  text-align: center;
+}
+
 h1 {
+  color: white;
+  padding: 5px;
+}
+
+h3 {
+  color: #2d2727;
+  margin: 2rem 0 .5rem 0;
+}
+
+main {
+  text-align: center;
+}
+
+hr {
+  width: 10rem;
+}
+
+ul {
+  list-style-type: none;
+}
+
+button {
+  color: #fff;
+  background: #266626;
+  border-radius: 50px;
+  transition: all ease-in-out 0.3s;
+  font-weight: 500;
+  margin-left: 8px;
+  line-height: 1;
+  font-size: 13px;
+}
+
+button:hover {
+  background-color: green;
+  cursor: pointer;
+}
+
+a {
   color: darkblue;
 }
 
-h2 {
-  color: darkgreen;
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: #266626;
+  width: 100%;
+  color: white;
+}
+
+footer p {
+  text-align: center;
 }

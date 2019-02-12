@@ -11,15 +11,4 @@ module.exports = (filepath) => {
     console.log('returning true, so it should apply handler');
     return true;
   }
-
-  // try {
-  //   console.log('inside!!')
-  //   if (filepath == '/') return false;
-  //   var stats = fs.statSync(app_dir + filepath);
-  //   return true;
-  // }
-  // catch(err) {
-  //     if (err.code == 'ENOENT') return false;
-  //     else console.log('There was an error reading pathname');
-  // }
 }
