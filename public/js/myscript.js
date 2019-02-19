@@ -1,3 +1,5 @@
+const url = process.env.URL || 'http://localhost:3000/';
+
 // get request to fetch string of all files
 var req = new XMLHttpRequest();
 req.open("GET", "/api/allFiles", true);
@@ -7,7 +9,7 @@ req.addEventListener("load", function() {
   filesArray.forEach(function(item) {
     var li = document.createElement('li');
     var a = document.createElement('a');
-    a.setAttribute('href', 'http://localhost:8000/' + encodeURIComponent(item));
+    a.setAttribute('href', url + encodeURIComponent(item));
     a.textContent = item;
     let button = document.createElement('button');
     button.setAttribute('class', 'delete-button');
