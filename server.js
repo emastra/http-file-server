@@ -5,6 +5,8 @@ const handler = require('./handler');
 const staticServer = require('./utils/staticServer');
 const fileExists = require('./utils/fileExists');
 const app_dir = require('./config').app_dir;
+// set port to heroku environment variable OR default to 3000
+const port = process.env.PORT || 3000;
 
 const routes = {
   '/api/allFiles': (request, response) => {
@@ -34,6 +36,6 @@ const server = http.createServer(function(request, response) {
   } else {
     staticServer(request, response);
   }
-}).listen(8000, () => {
-  console.log('Server started on port 8000...');
+}).listen(port, () => {
+  console.log(`Server is up on port ${port}`);
 });
